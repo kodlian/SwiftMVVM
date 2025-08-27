@@ -196,9 +196,7 @@ struct ParentView: View {
 }
 ```
 
----
-
-### Or Use @Inject for Less Boilerplate
+Or Use @Inject for even less boilerplate:
 
 ```swift
 @Observable
@@ -439,8 +437,8 @@ ContentView()
 
 @Observable
 class MyViewModel {
-    @ObservationIgnored @Inject(\.database) var database: DatabaseService
-    @ObservationIgnored @Inject(\.cache) var cache: CacheService
+    @ObservationIgnored @Inject(\AppServices.database) var database: DatabaseService
+    @ObservationIgnored @Inject(\AppServices.cache) var cache: CacheService
 }
 ```
 
