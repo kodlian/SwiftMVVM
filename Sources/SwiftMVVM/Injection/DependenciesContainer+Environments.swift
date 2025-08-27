@@ -28,7 +28,7 @@ import SwiftUI
 
 extension EnvironmentValues {
     /// The dependencies container available in the current environment.
-    @Entry var dependenciesContainer: DependenciesContainer = .init()
+    @Entry public var dependenciesContainer: DependenciesContainer = .init()
 }
 
 extension View {
