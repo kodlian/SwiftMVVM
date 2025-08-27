@@ -454,12 +454,12 @@ For unit testing or other contexts outside SwiftUI, use `withDependencies`:
 import Testing
 @testable import MyApp
 
-@Test func userViewModelLoadsUsers() async {
+@Test func usersViewModelLoadsUsers() async {
     let container = DependenciesContainer()
-        .register(MockUserService())
+        .register(MockUsersService(), as: UsersService.self)
 
     let viewModel = container.withDependencies {
-        UserViewModel()
+        UsersViewModel()
     }
 
     await viewModel.loadUsers()
@@ -491,6 +491,16 @@ class UserViewModel {
     }
 }
 ```
+
+### Dependency Linting
+
+A potential **SwiftMVVM Linter** could use Swift syntax analysis and IndexStoreDB to:
+
+- **Verify injection hierarchy**: Lint that all `@Inject` properties have corresponding `.inject()` calls in parent views
+- **Detect missing dependencies**: Identify ViewModels using `@Inject` without proper registration
+- **Validate type safety**: Check injected types match expected interfaces
+
+This would provide compile-time safety while maintaining clean environment-based injection syntax.
 
 ---
 
