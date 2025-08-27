@@ -1,8 +1,27 @@
 //
-//  DependenciesContainer+Env.swift
-//  Template
+//  DependenciesContainer+Environments.swift
+//  SwiftMVVM
 //
-//  Created by Jeremy Marchand on 21/8/25.
+//  Created by Jérémy Marchand.
+//  Copyright © 2025 Jérémy Marchand. All rights reserved.
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 //
 
 import SwiftUI
@@ -28,9 +47,6 @@ extension View {
     /// - Parameters:
     ///   - instance: The instance to inject
     ///   - type: The type to register the instance as (defaults to the instance's type)
-    ///   - file: The file where injection occurs (for debugging)
-    ///   - line: The line where injection occurs (for debugging)
-    ///   - function: The function where injection occurs (for debugging)
     /// - Returns: A view with the injected dependency in its environment
     public func inject<T: Sendable>(
         _ instance: T,
@@ -50,9 +66,6 @@ extension View {
     ///   - type: The type to register the factory for
     ///   - shared: If true, creates a single instance and stores it as shared
     ///   - builder: The factory function that creates instances
-    ///   - file: The file where injection occurs (for debugging)
-    ///   - line: The line where injection occurs (for debugging)
-    ///   - function: The function where injection occurs (for debugging)
     /// - Returns: A view with the injected dependency factory in its environment
     public func inject<T: Sendable>(
         as type: T.Type = T.self,
