@@ -24,6 +24,8 @@ SwiftUI's `@Observable` macro is powerful and should be preferred over the older
 
 However, `@Observable` and `@State` have limitations when working with complex view model instantiation patterns and dependency injection. **This package addresses these gaps** while preserving all the benefits of `@Observable`.
 
+---
+
 ## Features
 
 - 🔗 **ViewModelState**: Property wrapper for managing observable ViewModels with lifecycle-aware instantiation
@@ -33,6 +35,8 @@ However, `@Observable` and `@State` have limitations when working with complex v
 - 🧵 **Concurrency Safe**: Full support for Swift 6 strict concurrency
 - 📱 **Modern SwiftUI**: Built for iOS 17+, macOS 14+, and other Apple modern platforms
 - 🪶 **Minimal Impact**: Preserves SwiftUI's composition and navigation patterns without architectural constraints
+
+---
 
 ## Design Philosophy
 
@@ -47,6 +51,8 @@ SwiftMVVM is designed to **add the minimal possible layer** to SwiftUI while ena
 **Optional adoption**: Choose to use the built-in injection system or not, or use only specific ViewModel features that add value to your project.
 
 **Observable-first**: Built around Swift's modern `@Observable` macro for optimal performance and SwiftUI integration.
+
+---
 
 ## Installation
 
@@ -65,6 +71,8 @@ dependencies: [
     .package(url: "https://github.com/kodlian/SwiftMVVM", from: "1.0.0")
 ]
 ```
+
+---
 
 ## Quick Start
 
@@ -94,7 +102,9 @@ struct ContentView: View {
 }
 ```
 
-**Note**: In this case, `@State` will work perfectly as the ViewModel is initialized at view creation. `@ViewModelState` provides the same behavior while adding support for more behaviours.
+> **Note**: In this case, `@State` will work perfectly as the ViewModel is initialized at view creation. `@ViewModelState` provides the same behavior while adding support for more behaviours.
+
+---
 
 ### Passing Parameters to ViewModel
 
@@ -103,19 +113,19 @@ When your ViewModel needs initialization parameters, use the closure-based initi
 ```swift
 @Observable
 class ProductDetailViewModel {
-    let productId: String
+    let product: Product
 
-    init(productId: String) {
-        self.productId = productId
+    init(product: Product) {
+        self.product = product
     }
 }
 
 struct ProductDetailView: View {
     @ViewModelState var viewModel: ProductDetailViewModel
 
-    init(productId: String) {
+    init(product: Product) {
         self._viewModel = ViewModelState { _ in
-            ProductDetailViewModel(productId: productId)
+            ProductDetailViewModel(product: product)
         }
     }
 
@@ -132,7 +142,9 @@ struct ProductDetailView: View {
 }
 ```
 
-**Note**: Using `@State` to hold a ViewModel won't work here — the ViewModel will be reinitialized whenever the parent view refreshes because `@State` doesn't accept a closure to lazily compute its initial value. `@StateObject` provides that behavior for `ObservableObject`-based view models; `@ViewModelState` provides the same lifecycle semantics for types using the `@Observable` macro.
+> **Note**: Using `@State` to hold a ViewModel won't work here — the ViewModel will be reinitialized whenever the parent view refreshes because `@State` doesn't accept a closure to lazily compute its initial value. `@StateObject` provides that behavior for `ObservableObject`-based view models; `@ViewModelState` provides the same lifecycle semantics for types using the `@Observable` macro.
+
+---
 
 ### With Dependency Injection
 
@@ -184,6 +196,8 @@ struct ParentView: View {
 }
 ```
 
+---
+
 ### Or Use @Inject for Less Boilerplate
 
 ```swift
@@ -218,6 +232,8 @@ struct ParentView: View {
 }
 ```
 
+---
+
 ## Core Components
 
 ### ViewModelState
@@ -237,6 +253,8 @@ struct MyView: View {
     }
 }
 ```
+
+---
 
 ### WithViewModel
 
@@ -265,6 +283,8 @@ struct MyView {
     }
 }
 ```
+
+---
 
 ### Dependency Injection
 
@@ -297,7 +317,9 @@ struct MyView: View {
 }
 ```
 
-**Important**: This injection system is designed for **providing services to ViewModels deep in view hierarchies**, not for building complex dependency graphs between services. It's optimized for minimal SwiftUI impact while enabling boilerplate free MVVM architecture.
+> **Important**: This injection system is designed for **providing services to ViewModels deep in view hierarchies**, not for building complex dependency graphs between services. It's optimized for minimal SwiftUI impact while enabling boilerplate free MVVM architecture.
+
+---
 
 #### Why Environment-Based Injection?
 
@@ -350,6 +372,8 @@ NavigationView {
 
 **🏗️ No Global State**: Avoids the pitfalls of global singletons that can make apps hard to reason about and test, while still providing the convenience of easy access throughout the view hierarchy.
 
+---
+
 #### Safety Considerations and Best Practices
 
 Environment-based injection trades compile-time safety for significantly reduced boilerplate and architectural simplicity in SwiftUI applications. This is a deliberate design choice to keep your SwiftUI code clean and maintainable.
@@ -397,6 +421,8 @@ struct MyView: View {
 
 This will show you exactly where each dependency was injected in the view hierarchy, making debugging straightforward.
 
+---
+
 ### @Inject with KeyPath
 
 Access nested properties from composite dependencies:
@@ -418,6 +444,8 @@ class MyViewModel {
 }
 ```
 
+---
+
 ### @Inject outside Views
 
 For unit testing or other contexts outside SwiftUI, use `withDependencies`:
@@ -438,6 +466,8 @@ import Testing
     #expect(viewModel.users.count == 3)
 }
 ```
+
+---
 
 ## Future Directions
 
@@ -461,6 +491,8 @@ class UserViewModel {
     }
 }
 ```
+
+---
 
 ## Requirements
 
