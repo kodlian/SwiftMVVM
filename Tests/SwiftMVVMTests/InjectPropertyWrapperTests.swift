@@ -62,7 +62,7 @@ struct InjectPropertyWrapperTests {
         container.register(InjectTestService(name: "type-test"), as: InjectTestService.self)
 
         // Test Inject initialization (simulating what happens in ViewModels)
-        let result = DependenciesContainer.$current.withValue(container) {
+        let result = container.withDependencies {
             let inject = Inject<InjectTestService>(InjectTestService.self)
             return inject.wrappedValue.name
         }
@@ -79,12 +79,12 @@ struct InjectPropertyWrapperTests {
         container.register(composite, as: CompositeService.self)
 
         // Test Inject initialization with keypath
-        let databaseResult = DependenciesContainer.$current.withValue(container) {
+        let databaseResult = container.withDependencies {
             let inject = Inject<String>(\CompositeService.database)
             return inject.wrappedValue
         }
 
-        let cacheResult = DependenciesContainer.$current.withValue(container) {
+        let cacheResult = container.withDependencies {
             let inject = Inject<String>(\CompositeService.cache)
             return inject.wrappedValue
         }
@@ -99,7 +99,7 @@ struct InjectPropertyWrapperTests {
         let container = DependenciesContainer()
 
         // This test verifies the error condition would be detected
-        let hasDependency = DependenciesContainer.$current.withValue(container) {
+        let hasDependency = container.withDependencies {
             container[InjectTestService.self] != nil
         }
 
@@ -112,7 +112,7 @@ struct InjectPropertyWrapperTests {
         var container = DependenciesContainer()
         container.register(InjectTestService(name: "inferred"))
 
-        let result = DependenciesContainer.$current.withValue(container) {
+        let result = container.withDependencies {
             // This simulates @Inject var service: InjectTestService
             let inject = Inject<InjectTestService>()
             return inject.wrappedValue.name
@@ -138,7 +138,7 @@ struct InjectPropertyWrapperTests {
             as: TestProtocol.self
         )
 
-        let result = DependenciesContainer.$current.withValue(container) {
+        let result = container.withDependencies {
             let inject = Inject<TestProtocol>()
             return inject.wrappedValue.identifier
         }

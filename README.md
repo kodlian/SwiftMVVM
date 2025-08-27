@@ -397,7 +397,7 @@ struct MyView: View {
 
 This will show you exactly where each dependency was injected in the view hierarchy, making debugging straightforward.
 
-### KeyPath Injection
+### @Inject with KeyPath
 
 Access nested properties from composite dependencies:
 
@@ -415,6 +415,27 @@ ContentView()
 class MyViewModel {
     @ObservationIgnored @Inject(\.database) var database: DatabaseService
     @ObservationIgnored @Inject(\.cache) var cache: CacheService
+}
+```
+
+### @Inject outside Views
+
+For unit testing or other contexts outside SwiftUI, use `withDependencies`:
+
+```swift
+import Testing
+@testable import MyApp
+
+@Test func userViewModelLoadsUsers() async {
+    let container = DependenciesContainer()
+        .register(MockUserService())
+
+    let viewModel = container.withDependencies {
+        UserViewModel()
+    }
+
+    await viewModel.loadUsers()
+    #expect(viewModel.users.count == 3)
 }
 ```
 

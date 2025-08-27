@@ -113,12 +113,8 @@ public struct ViewModelState<ViewModel: AnyObject & Observable>: DynamicProperty
     public nonisolated mutating func update() {
         MainActor.assumeIsolated {
             if reference.value == nil {
-                // Use the dependency container from the environment
-                // Dependencies are automatically populated when .inject() is called
-                let container = env.dependenciesContainer
-
                 // Set the task-local dependency container for @Inject to work in ViewModels
-                reference.value = DependenciesContainer.$current.withValue(container) {
+                reference.value = env.dependenciesContainer.withDependencies {
                     makeViewModel(env)
                 }
             }

@@ -158,4 +158,20 @@ public struct DependenciesContainer: Sendable {
             services[k] = v
         }
     }
+
+    /// Executes a closure with this dependencies container set as the current context for injection.
+    ///
+    /// This method temporarily sets this `DependenciesContainer` as the task-local
+    /// container for the duration of the provided closure. All dependency lookups
+    /// within the closure (such as those performed by `@Inject`) will use this container.
+    ///
+    /// - Parameter work: The closure to execute with this container as the context.
+    /// - Returns: The result produced by the closure.
+    /// - Throws: Any error thrown by the closure.
+    @discardableResult
+    public func withDependencies<T>(_ work: () throws -> T) rethrows -> T {
+        try DependenciesContainer.$current.withValue(self) {
+            try work()
+        }
+    }
 }
