@@ -27,7 +27,7 @@ However, `@Observable` and `@State` have limitations when working with complex v
 ## Features
 
 - 🔗 **ViewModelState**: Property wrapper for managing observable ViewModels with lifecycle-aware instantiation
-- 🤲 **WithViewModel**: Inline ViewModel creation with dependency injection support
+- 🤲 **WithViewModel**: Inline ViewModel creation from parent view with dependency injection support
 - 💉 **Deep Injection**: Simple service injection deep into view hierarchies for ViewModels
 - 🎯 **@Inject**: Property wrapper for seamless dependency injection in ViewModels
 - 🧵 **Concurrency Safe**: Full support for Swift 6 strict concurrency
@@ -94,6 +94,8 @@ struct ContentView: View {
 }
 ```
 
+**Note**: In this case, `@State` will work perfectly as the ViewModel is initialized at view creation. `@ViewModelState` provides the same behavior while adding support for more behaviours.
+
 ### Passing Parameters to ViewModel
 
 When your ViewModel needs initialization parameters, use the closure-based initializer:
@@ -130,7 +132,11 @@ struct ProductDetailView: View {
 }
 ```
 
+**Note**: Using `@State` to hold a ViewModel won't work here — the ViewModel will be reinitialized whenever the parent view refreshes because `@State` doesn't accept a closure to lazily compute its initial value. `@StateObject` provides that behavior for `ObservableObject`-based view models; `@ViewModelState` provides the same lifecycle semantics for types using the `@Observable` macro.
+
 ### With Dependency Injection
+
+In addition to providing the missing lifecycle mechanism, `@ViewModelState` lets you initialize view models from values in the environment—most commonly service dependencies provided by this package’s environment injection system.
 
 ```swift
 protocol UserService {
@@ -234,18 +240,27 @@ struct MyView: View {
 
 ### WithViewModel
 
-For inline ViewModel creation:
+For inline ViewModel creation in parent body:
 
 ```swift
-struct MyView: View {
+
+struct ContentView: View {
     var body: some View {
         WithViewModel { _ in
             MyViewModel()
         } content: { viewModel in
-            VStack {
-                Text(viewModel.title)
-                Button("Action", action: viewModel.performAction)
-            }
+            MyView(viewModel: viewModel)
+        }
+    }
+}
+
+struct MyView {
+    let viewModel: MyViewModel // Ownership is handled within `WithViewModel`.
+
+    var body: some View {
+        VStack {
+            Text(viewModel.title)
+            Button("Action", action: viewModel.performAction)
         }
     }
 }
@@ -253,7 +268,7 @@ struct MyView: View {
 
 ### Dependency Injection
 
-Type-safe dependency container with SwiftUI integration:
+Type-safe dependency container with SwiftUI's environment integration:
 
 ```swift
 // Register dependencies at parent level
@@ -261,17 +276,81 @@ ContentView()
     .inject(DatabaseService())
     .inject(as: NetworkService.self) { NetworkService(baseURL: "https://api.example.com") }
 
-// Access in child ViewModels anywhere in the hierarchy
+// Access in child ViewModels anywhere in the hierarchy using the `@Inject`
 @Observable
 class MyViewModel {
     @ObservationIgnored @Inject var database: DatabaseService
     @ObservationIgnored @Inject var network: NetworkService
 }
+
+// Or by reading manually in env during ViewModel initialisation.
+struct MyView: View {
+    @ViewModelState var viewModel: MyViewModel
+
+    init() {
+        self._viewModel = ViewModelState { env in
+            let database = env[dependency: DatabaseService.self]!
+            let network = env[dependency: NetworkService.self]!
+            MyViewModel(...
+        }
+    }
+}
 ```
 
 **Important**: This injection system is designed for **providing services to ViewModels deep in view hierarchies**, not for building complex dependency graphs between services. It's optimized for minimal SwiftUI impact while enabling boilerplate free MVVM architecture.
 
-### Safety Considerations and Best Practices
+#### Why Environment-Based Injection?
+
+Environment-based injection offers significant advantages over global singletons or shared instances:
+
+**🧪 Testability**: Each view hierarchy can have its own dependency scope, making unit testing and UI testing much easier:
+
+```swift
+// Production
+ContentView()
+    .inject(ProductionUserService())
+
+// Testing
+ContentView()
+    .inject(MockUserService()) // Different implementation, same interface
+```
+
+**🔄 Flexibility**: Different parts of your app can use different implementations without complex configuration:
+
+```swift
+// Main app flow uses production services
+MainTabView()
+    .inject(ProductionAnalytics())
+
+// Onboarding flow uses different analytics
+OnboardingView()
+    .inject(OnboardingAnalytics()) // Specialized implementation
+```
+
+**🎯 Scoped Dependencies**: Dependencies are automatically scoped to their view hierarchy, preventing unwanted cross-contamination:
+
+```swift
+// Each modal has its own isolated dependency scope
+NavigationView {
+    MainView()
+}
+.inject(MainFlowServices())
+.sheet(isPresented: $showSettings) {
+    SettingsView()
+        .inject(SettingsServices()) // Completely separate scope
+}
+```
+
+**🚀 SwiftUI Native**: Works seamlessly with SwiftUI's composition model, navigation, and state management without fighting the framework:
+
+- Automatic cleanup when views are dismissed
+- Respects SwiftUI's view lifecycle
+- No manual memory management required
+- Plays nicely with SwiftUI previews
+
+**🏗️ No Global State**: Avoids the pitfalls of global singletons that can make apps hard to reason about and test, while still providing the convenience of easy access throughout the view hierarchy.
+
+#### Safety Considerations and Best Practices
 
 Environment-based injection trades compile-time safety for significantly reduced boilerplate and architectural simplicity in SwiftUI applications. This is a deliberate design choice to keep your SwiftUI code clean and maintainable.
 
@@ -281,6 +360,8 @@ Environment-based injection trades compile-time safety for significantly reduced
 - Root of authenticated user flows
 - Beginning of major feature flows (editing, onboarding, etc.)
 - Modal presentations or navigation destinations
+
+Let the ViewModel at the root of each flow be responsible for creating and configuring its services. It can construct a DependenciesContainer internally to initialize those services and then expose or inject them into the associated view using the container that will be merged with existing one in the environment.
 
 **Debugging Dependencies**: You can easily inspect what dependencies are available at any point by printing the container's debug description in your ViewModel initializer:
 
