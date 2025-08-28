@@ -1,7 +1,7 @@
 # SwiftMVVM
 
 <p align="center">
-    <img src="Resources/Logo.png" alt="SwiftMVVM Logo" width="256" height="256">
+    <img src="https://github.com/user-attachments/assets/cd0faac2-e688-4235-8550-e3e888787f17" alt="SwiftMVVM Logo" width="295" height="295">
 </p>
 
 **SwiftMVVM** is a lightweight and pragmatic package for building SwiftUI applications using the **Model–View–ViewModel (MVVM)** architectural pattern.
