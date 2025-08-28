@@ -42,7 +42,7 @@ import SwiftUI
 /// ```
 public struct DependenciesContainer: Sendable {
     /// Task-local storage for the current dependencies container.
-    /// Used by `@Inject` property wrapper to access dependencies within ViewModels.
+    /// Used by `@Injected` property wrapper to access dependencies within ViewModels.
     @TaskLocal static var current: DependenciesContainer?
 
     /// Represents a single dependency injection with its value and debug information.
@@ -163,7 +163,7 @@ public struct DependenciesContainer: Sendable {
     ///
     /// This method temporarily sets this `DependenciesContainer` as the task-local
     /// container for the duration of the provided closure. All dependency lookups
-    /// within the closure (such as those performed by `@Inject`) will use this container.
+    /// within the closure (such as those performed by `@Injected`) will use this container.
     ///
     /// - Parameter work: The closure to execute with this container as the context.
     /// - Returns: The result produced by the closure.

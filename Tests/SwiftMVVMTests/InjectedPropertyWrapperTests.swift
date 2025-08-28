@@ -51,8 +51,8 @@ struct CompositeService: Sendable {
 
 // MARK: - Inject Property Wrapper Tests
 
-@Suite("Inject Property Wrapper Tests")
-struct InjectPropertyWrapperTests {
+@Suite("Injected Property Wrapper Tests")
+struct InjectedPropertyWrapperTests {
 
     @Test("Inject initializes with type parameter")
     @MainActor
@@ -63,7 +63,7 @@ struct InjectPropertyWrapperTests {
 
         // Test Inject initialization (simulating what happens in ViewModels)
         let result = container.withDependencies {
-            let inject = Inject<InjectTestService>(InjectTestService.self)
+            let inject = Injected<InjectTestService>(InjectTestService.self)
             return inject.wrappedValue.name
         }
 
@@ -80,12 +80,12 @@ struct InjectPropertyWrapperTests {
 
         // Test Inject initialization with keypath
         let databaseResult = container.withDependencies {
-            let inject = Inject<String>(\CompositeService.database)
+            let inject = Injected<String>(\CompositeService.database)
             return inject.wrappedValue
         }
 
         let cacheResult = container.withDependencies {
-            let inject = Inject<String>(\CompositeService.cache)
+            let inject = Injected<String>(\CompositeService.cache)
             return inject.wrappedValue
         }
 
@@ -113,8 +113,8 @@ struct InjectPropertyWrapperTests {
         container.register(InjectTestService(name: "inferred"))
 
         let result = container.withDependencies {
-            // This simulates @Inject var service: InjectTestService
-            let inject = Inject<InjectTestService>()
+            // This simulates @Injected var service: InjectTestService
+            let inject = Injected<InjectTestService>()
             return inject.wrappedValue.name
         }
 
@@ -139,7 +139,7 @@ struct InjectPropertyWrapperTests {
         )
 
         let result = container.withDependencies {
-            let inject = Inject<TestProtocol>()
+            let inject = Injected<TestProtocol>()
             return inject.wrappedValue.identifier
         }
 

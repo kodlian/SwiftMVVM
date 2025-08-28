@@ -50,11 +50,11 @@ import SwiftUI
 /// }
 /// ```
 ///
-/// Or with @Inject (recommended):
+/// Or with @Injected (recommended):
 ///
 /// ```swift
 /// @Observable class MyViewModel {
-///     @ObservationIgnored @Inject var service: MyService
+///     @ObservationIgnored @Injected var service: MyService
 /// }
 ///
 /// struct MyView: View {

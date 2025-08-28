@@ -31,7 +31,7 @@ However, `@Observable` and `@State` have limitations when working with complex v
 - 🔗 **ViewModelState**: Property wrapper for managing observable ViewModels with lifecycle-aware instantiation
 - 🤲 **WithViewModel**: Inline ViewModel creation from parent view with dependency injection support
 - 💉 **Deep Injection**: Simple service injection deep into view hierarchies for ViewModels
-- 🎯 **@Inject**: Property wrapper for seamless dependency injection in ViewModels
+- 🎯 **@Injected**: Property wrapper for seamless dependency injection in ViewModels
 - 🧵 **Concurrency Safe**: Full support for Swift 6 strict concurrency
 - 📱 **Modern SwiftUI**: Built for iOS 17+, macOS 14+, and other Apple modern platforms
 - 🪶 **Minimal Impact**: Preserves SwiftUI's composition and navigation patterns without architectural constraints
@@ -210,12 +210,12 @@ struct ParentView: View {
 }
 ```
 
-Or Use @Inject for even less boilerplate:
+Or Use @Injected for even less boilerplate:
 
 ```swift
 @Observable
 class UserViewModel {
-    @ObservationIgnored @Inject var userService: UserService
+    @ObservationIgnored @Injected var userService: UserService
     @State var users: [User] = []
 
     func loadUsers() async {
@@ -312,11 +312,11 @@ ContentView()
     .inject(DatabaseService())
     .inject(as: NetworkService.self) { NetworkService(baseURL: "https://api.example.com") }
 
-// Access in child ViewModels anywhere in the hierarchy using the `@Inject`
+// Access in child ViewModels anywhere in the hierarchy using the `@Injected`
 @Observable
 class MyViewModel {
-    @ObservationIgnored @Inject var database: DatabaseService
-    @ObservationIgnored @Inject var network: NetworkService
+    @ObservationIgnored @Injected var database: DatabaseService
+    @ObservationIgnored @Injected var network: NetworkService
 }
 
 // Or by reading manually in env during ViewModel initialisation.
@@ -408,7 +408,7 @@ Let the ViewModel at the root of each flow be responsible for creating and confi
 ```swift
 @Observable
 class MyViewModel {
-    @ObservationIgnored @Inject var userService: UserService
+    @ObservationIgnored @Injected var userService: UserService
 
     init() {
         // Debug: Print available dependencies and their injection points
@@ -439,7 +439,7 @@ This will show you exactly where each dependency was injected in the view hierar
 
 ---
 
-### @Inject with KeyPath
+### @Injected with KeyPath
 
 Access nested properties from composite dependencies:
 
@@ -455,14 +455,14 @@ ContentView()
 
 @Observable
 class MyViewModel {
-    @ObservationIgnored @Inject(\AppServices.database) var database: DatabaseService
-    @ObservationIgnored @Inject(\AppServices.cache) var cache: CacheService
+    @ObservationIgnored @Injected(\AppServices.database) var database: DatabaseService
+    @ObservationIgnored @Injected(\AppServices.cache) var cache: CacheService
 }
 ```
 
 ---
 
-### @Inject outside Views
+### @Injected outside Views
 
 For unit testing or other contexts outside SwiftUI, use `withDependencies`:
 
@@ -491,15 +491,15 @@ import Testing
 
 I am exploring Swift Macros to further reduce boilerplate and improve the developer experience:
 
-- **Automatic `@ObservationIgnored`**: Eliminate the need to manually add `@ObservationIgnored` before `@Inject` properties
+- **Automatic `@ObservationIgnored`**: Eliminate the need to manually add `@ObservationIgnored` before `@Injected` properties
 - **Initializer Injection**: Enable dependency injection directly within ViewModel initializers without requiring property wrappers
 
 These improvements would allow for cleaner ViewModel definitions like:
 
 ```swift
-@ViewModel // Future macro that adds @Observable and automatically adds @ObservationIgnored to all @Inject properties
+@ViewModel // Future macro that adds @Observable and automatically adds @ObservationIgnored to all @Injected properties
 class UserViewModel {
-    @Inject var userService: UserService  // No @ObservationIgnored needed
+    @Injected var userService: UserService  // No @ObservationIgnored needed
 
     init(networkService: NetworkService = #inject(NetworkService)) {  // Future: inject in init macro
         // Initialization with injected dependencies
@@ -512,8 +512,8 @@ class UserViewModel {
 
 A potential **SwiftMVVM Linter** could use Swift syntax analysis and IndexStoreDB to:
 
-- **Verify injection hierarchy**: Lint that all `@Inject` properties have corresponding `.inject()` calls in parent views
-- **Detect missing dependencies**: Identify ViewModels using `@Inject` without proper registration
+- **Verify injection hierarchy**: Lint that all `@Injected` properties have corresponding `.inject()` calls in parent views
+- **Detect missing dependencies**: Identify ViewModels using `@Injected` without proper registration
 - **Validate type safety**: Check injected types match expected interfaces
 
 This would provide compile-time safety while maintaining clean environment-based injection syntax.
