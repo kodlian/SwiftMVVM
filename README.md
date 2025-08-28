@@ -144,6 +144,20 @@ struct ProductDetailView: View {
 
 > **Note**: Using `@State` to hold a ViewModel won't work here — the ViewModel will be reinitialized whenever the parent view refreshes because `@State` doesn't accept a closure to lazily compute its initial value. `@StateObject` provides that behavior for `ObservableObject`-based view models; `@ViewModelState` provides the same lifecycle semantics for types using the `@Observable` macro.
 
+If you wish to create ViewModels outside the view hierarchy, you can either use a autoclosure initializer on the view, or use `WithViewModel` for inline creation.
+
+```swift
+struct ProductDetailView: View {
+     init(model: @autclosure @escaping () -> ProductDetailViewModel) {
+        self._viewModel = ViewModelState { _ in
+            model()
+        }
+    }
+}
+
+ProductDetailView(model: ProductDetailViewModel(product: product))
+```
+
 ---
 
 ### With Dependency Injection
@@ -271,7 +285,9 @@ struct ContentView: View {
 }
 
 struct MyView {
-    let viewModel: MyViewModel // Ownership is handled within `WithViewModel`.
+    let viewModel: MyViewModel // Ownership is handled within `WithViewModel`
+                               // But thanks to the magic of Observable, all property changes read
+                               // in the view body are automatically tracked.
 
     var body: some View {
         VStack {
@@ -281,6 +297,8 @@ struct MyView {
     }
 }
 ```
+
+> **Note**: This eliminates the need to add an autoclosure initializer to your view. Otherwise, the view model would be recreated repeatedly if you simply pass the creation statement of your view model to the view.
 
 ---
 
@@ -514,7 +532,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-SwiftMVVM is available under the MIT license. See the LICENSE file for more info.
+SwiftMVVM is available under the MIT license. See the [LICENSE](LICENSE) file for more info.
 
 ## Author
 
