@@ -26,7 +26,7 @@
 
 import SwiftUI
 
-// MARK: - @Inject Property Wrapper for ViewModels
+// MARK: - @Injected Property Wrapper for ViewModels
 
 /// A property wrapper that injects dependencies into ViewModels from the environment.
 /// Unlike `@Environment`, this can be used directly in Observable ViewModels.
@@ -36,23 +36,23 @@ import SwiftUI
 /// ```swift
 /// @Observable
 /// class MyViewModel {
-///     @Inject var database: DatabaseService
-///     @Inject var container: AppServicesContainer
+///     @Injected var database: DatabaseService
+///     @Injected var container: AppServicesContainer
 /// }
 /// ```
 @propertyWrapper @MainActor
-public struct Inject<T> {
+public struct Injected<T> {
     private let value: T
 
     /// Creates an Inject property wrapper for the specified type.
     ///
-    /// The dependency must be registered in the environment using `.inject(_:)` modifier.
+    /// The dependency must be registered in the environment us/Users/jeremy/Developer/Swift/Libraries/SwiftMVVM/Sources/SwiftMVVM/Injection/Inject.swifting `.inject(_:)` modifier.
     ///
     /// - Parameter type: The type of dependency to inject (defaults to T.self)
     public init(_ type: T.Type = T.self) {
         guard let container = DependenciesContainer.current else {
             fatalError(
-                "@Inject can only be used within ViewModels created through ViewModelState or WithViewModel"
+                "@Injected can only be used within ViewModels created through ViewModelState or WithViewModel"
             )
         }
         guard let value = container[type] else {
@@ -71,7 +71,7 @@ public struct Inject<T> {
     public init<D>(_ keyPath: KeyPath<D, T>) {
         guard let container = DependenciesContainer.current else {
             fatalError(
-                "@Inject can only be used within ViewModels created through ViewModelState or WithViewModel"
+                "@Injected can only be used within ViewModels created through ViewModelState or WithViewModel"
             )
         }
         guard let value = container[D.self]?[keyPath: keyPath] else {

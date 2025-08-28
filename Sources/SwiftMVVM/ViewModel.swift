@@ -51,13 +51,13 @@ import SwiftUI
 /// }
 /// ```
 ///
-/// Or use @Inject directly in the ViewModel for less boilerplate:
+/// Or use @Injected directly in the ViewModel for less boilerplate:
 ///
 /// ```swift
 /// @Observable
 /// class MyViewModel {
-///    @ObservationIgnored @Inject<NetworkService> var networkService: NetworkService
-///    @ObservationIgnored @Inject(\ServiceSuite.service1) var service1: NetworkService
+///    @ObservationIgnored @Injected<NetworkService> var networkService: NetworkService
+///    @ObservationIgnored @Injected(\ServiceSuite.service1) var service1: NetworkService
 /// }
 ///
 /// struct MyView: View {
@@ -113,7 +113,7 @@ public struct ViewModelState<ViewModel: AnyObject & Observable>: DynamicProperty
     public nonisolated mutating func update() {
         MainActor.assumeIsolated {
             if reference.value == nil {
-                // Set the task-local dependency container for @Inject to work in ViewModels
+                // Set the task-local dependency container for @Injected to work in ViewModels
                 reference.value = env.dependenciesContainer.withDependencies {
                     makeViewModel(env)
                 }
