@@ -28,7 +28,7 @@ However, `@Observable` and `@State` have limitations when working with complex v
 
 ## Features
 
-- 🔗 **ViewModelState**: Property wrapper for managing observable ViewModels with lifecycle-aware instantiation
+- 🔗 **StateViewModel**: Property wrapper for managing observable ViewModels with lifecycle-aware instantiation
 - 🤲 **WithViewModel**: Inline ViewModel creation from parent view with dependency injection support
 - 💉 **Deep Injection**: Simple service injection deep into view hierarchies for ViewModels
 - 🎯 **@Injected**: Property wrapper for seamless dependency injection in ViewModels
@@ -68,7 +68,7 @@ Or add to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/kodlian/SwiftMVVM", from: "1.0.0")
+    .package(url: "https://github.com/kodlian/SwiftMVVM", from: "1.1.0")
 ]
 ```
 
@@ -91,7 +91,7 @@ class CounterViewModel {
 }
 
 struct ContentView: View {
-    @ViewModelState var viewModel = CounterViewModel()
+    @StateViewModel var viewModel = CounterViewModel()
 
     var body: some View {
         VStack {
@@ -102,7 +102,7 @@ struct ContentView: View {
 }
 ```
 
-> **Note**: In this case, `@State` will work perfectly as the ViewModel is initialized at view creation. `@ViewModelState` provides the same behavior while adding support for more behaviours.
+> **Note**: In this case, `@State` will work perfectly as the ViewModel is initialized at view creation. `@StateViewModel` provides the same behavior while adding support for more behaviours.
 
 ---
 
@@ -121,10 +121,10 @@ class ProductDetailViewModel {
 }
 
 struct ProductDetailView: View {
-    @ViewModelState var viewModel: ProductDetailViewModel
+    @StateViewModel var viewModel: ProductDetailViewModel
 
     init(product: Product) {
-        self._viewModel = ViewModelState { _ in
+        self._viewModel = StateViewModel { _ in
             ProductDetailViewModel(product: product)
         }
     }
@@ -142,14 +142,14 @@ struct ProductDetailView: View {
 }
 ```
 
-> **Note**: Using `@State` to hold a ViewModel won't work here — the ViewModel will be reinitialized whenever the parent view refreshes because `@State` doesn't accept a closure to lazily compute its initial value. `@StateObject` provides that behavior for `ObservableObject`-based view models; `@ViewModelState` provides the same lifecycle semantics for types using the `@Observable` macro.
+> **Note**: Using `@State` to hold a ViewModel won't work here — the ViewModel will be reinitialized whenever the parent view refreshes because `@State` doesn't accept a closure to lazily compute its initial value. `@StateObject` provides that behavior for `ObservableObject`-based view models; `@StateViewModel` provides the same lifecycle semantics for types using the `@Observable` macro.
 
 If you wish to create ViewModels outside the view hierarchy, you can either use a autoclosure initializer on the view, or use `WithViewModel` for inline creation.
 
 ```swift
 struct ProductDetailView: View {
      init(model: @autclosure @escaping () -> ProductDetailViewModel) {
-        self._viewModel = ViewModelState { _ in
+        self._viewModel = StateViewModel { _ in
             model()
         }
     }
@@ -162,7 +162,7 @@ ProductDetailView(model: ProductDetailViewModel(product: product))
 
 ### With Dependency Injection
 
-In addition to providing the missing lifecycle mechanism, `@ViewModelState` lets you initialize view models from values in the environment—most commonly service dependencies provided by this package’s environment injection system.
+In addition to providing the missing lifecycle mechanism, `@StateViewModel` lets you initialize view models from values in the environment—most commonly service dependencies provided by this package’s environment injection system.
 
 ```swift
 protocol UserService {
@@ -184,10 +184,10 @@ class UserViewModel {
 }
 
 struct UserListView: View {
-    @ViewModelState var viewModel: UserViewModel
+    @StateViewModel var viewModel: UserViewModel
 
     init() {
-        self._viewModel = ViewModelState { env in
+        self._viewModel = StateViewModel { env in
             UserViewModel(userService: env[dependency: UserService.self]!)
         }
     }
@@ -224,7 +224,7 @@ class UserViewModel {
 }
 
 struct UserListView: View {
-    @ViewModelState var viewModel = UserViewModel()
+    @StateViewModel var viewModel = UserViewModel()
 
     var body: some View {
         List(viewModel.users) { user in
@@ -248,16 +248,16 @@ struct ParentView: View {
 
 ## Core Components
 
-### ViewModelState
+### StateViewModel
 
 A property wrapper that manages Observable ViewModels with proper lifecycle:
 
 ```swift
 struct MyView: View {
-    @ViewModelState var viewModel: MyViewModel
+    @StateViewModel var viewModel: MyViewModel
 
     init() {
-        self._viewModel = ViewModelState { env in
+        self._viewModel = StateViewModel { env in
             MyViewModel(
                 service: env[dependency: MyService.self]!
             )
@@ -321,10 +321,10 @@ class MyViewModel {
 
 // Or by reading manually in env during ViewModel initialisation.
 struct MyView: View {
-    @ViewModelState var viewModel: MyViewModel
+    @StateViewModel var viewModel: MyViewModel
 
     init() {
-        self._viewModel = ViewModelState { env in
+        self._viewModel = StateViewModel { env in
             let database = env[dependency: DatabaseService.self]!
             let network = env[dependency: NetworkService.self]!
             MyViewModel(...
@@ -417,14 +417,14 @@ class MyViewModel {
 }
 ```
 
-Or when using the closure-based approach with `ViewModelState` or `WithViewModel`:
+Or when using the closure-based approach with `StateViewModel` or `WithViewModel`:
 
 ```swift
 struct MyView: View {
-    @ViewModelState var viewModel: MyViewModel
+    @StateViewModel var viewModel: MyViewModel
 
     init() {
-        self._viewModel = ViewModelState { env in
+        self._viewModel = StateViewModel { env in
             // Debug: Print available dependencies from environment
             let container = env.dependenciesContainer
             debugPrint(container)

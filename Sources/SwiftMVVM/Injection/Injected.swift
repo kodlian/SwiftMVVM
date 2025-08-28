@@ -52,7 +52,7 @@ public struct Injected<T> {
     public init(_ type: T.Type = T.self) {
         guard let container = DependenciesContainer.current else {
             fatalError(
-                "@Injected can only be used within ViewModels created through ViewModelState or WithViewModel"
+                "@Injected can only be used within ViewModels created through StateViewModel or WithViewModel"
             )
         }
         guard let value = container[type] else {
@@ -71,7 +71,7 @@ public struct Injected<T> {
     public init<D>(_ keyPath: KeyPath<D, T>) {
         guard let container = DependenciesContainer.current else {
             fatalError(
-                "@Injected can only be used within ViewModels created through ViewModelState or WithViewModel"
+                "@Injected can only be used within ViewModels created through StateViewModel or WithViewModel"
             )
         }
         guard let value = container[D.self]?[keyPath: keyPath] else {

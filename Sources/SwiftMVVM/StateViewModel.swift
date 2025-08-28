@@ -28,9 +28,9 @@ import SwiftUI
 
 /// A property wrapper type that instantiates an observable view model with dependency injection.
 ///
-/// It's like `@State` for view models, except that just like `@StateObject` its
-/// initializer accepts a closure so that a single instance of the
-/// observable view model is created for the whole lifetime of the view.
+/// Similar to `@StateObject`, this property wrapper ensures a single instance
+/// of the observable view model is created and retained for the lifetime of the view,
+/// using a closure-based initializer.
 /// Additionally, it provides safe dependency injection by passing the full
 /// `EnvironmentValues` to the view model factory closure.
 ///
@@ -38,10 +38,10 @@ import SwiftUI
 ///
 /// ```swift
 /// struct MyView: View {
-///     @ViewModelState var viewModel: MyViewModel
+///     @StateViewModel var viewModel: MyViewModel
 ///
 ///     init() {
-///         self._viewModel = ViewModelState { env in
+///         self._viewModel = StateViewModel { env in
 ///             MyViewModel(
 ///                 database: env[dependency: DatabaseService.self]!,
 ///                 network: env[dependency: NetworkService.self]!
@@ -61,11 +61,11 @@ import SwiftUI
 /// }
 ///
 /// struct MyView: View {
-///     @ViewModelState var viewModel = MyViewModel()
+///     @StateViewModel var viewModel = MyViewModel()
 /// }
 /// ```
 @propertyWrapper @MainActor
-public struct ViewModelState<ViewModel: AnyObject & Observable>: DynamicProperty {
+public struct StateViewModel<ViewModel: AnyObject & Observable>: DynamicProperty {
     class LazyRerefence {
         var value: ViewModel?
     }
@@ -74,14 +74,14 @@ public struct ViewModelState<ViewModel: AnyObject & Observable>: DynamicProperty
     @Environment(\.self) private var env
     let makeViewModel: (EnvironmentValues) -> ViewModel
 
-    /// Creates a ViewModelState with a factory closure that receives environment values.
+    /// Creates a StateViewModel with a factory closure that receives environment values.
     ///
     /// - Parameter makeViewModel: A closure that creates the view model using environment values
     public init(makeViewModel: @escaping (EnvironmentValues) -> ViewModel) {
         self.makeViewModel = makeViewModel
     }
 
-    /// Creates a ViewModelState with a simple autoclosure that creates the view model.
+    /// Creates a StateViewModel with a simple autoclosure that creates the view model.
     ///
     /// This initializer is convenient when the view model doesn't need environment values.
     ///
@@ -98,7 +98,7 @@ public struct ViewModelState<ViewModel: AnyObject & Observable>: DynamicProperty
     public var wrappedValue: ViewModel {
         precondition(
             reference.value != nil,
-            "ViewModelState should be accessed only after the view is rendered.")
+            "StateViewModel should be accessed only after the view is rendered.")
         return reference.value!
     }
 
