@@ -49,15 +49,21 @@ public struct Injected<T> {
     /// The dependency must be registered in the environment us/Users/jeremy/Developer/Swift/Libraries/SwiftMVVM/Sources/SwiftMVVM/Injection/Inject.swifting `.inject(_:)` modifier.
     ///
     /// - Parameter type: The type of dependency to inject (defaults to T.self)
-    public init(_ type: T.Type = T.self) {
+    public init(_ type: T.Type = T.self,
+                file: StaticString = #file,
+                line: UInt = #line) {
         guard let container = DependenciesContainer.current else {
             fatalError(
-                "@Injected can only be used within ViewModels created through StateViewModel or WithViewModel"
+                "@Injected can only be used within ViewModels created through StateViewModel or WithViewModel",
+                file: file,
+                line: line
             )
         }
         guard let value = container[type] else {
             fatalError(
-                "No \(T.self) found in the dependency container. Inject it with .inject(_:) at a parent view."
+                "No \(T.self) found in the dependency container. Inject it with .inject(_:) in a parent view's body.",
+                file: file,
+                line: line
             )
         }
         self.value = value
@@ -68,15 +74,21 @@ public struct Injected<T> {
     /// This allows injecting properties from a larger dependency object.
     ///
     /// - Parameter keyPath: A key path from the dependency type D to the desired property T
-    public init<D>(_ keyPath: KeyPath<D, T>) {
+    public init<D>(_ keyPath: KeyPath<D, T>,
+                   file: StaticString = #file,
+                   line: UInt = #line) {
         guard let container = DependenciesContainer.current else {
             fatalError(
-                "@Injected can only be used within ViewModels created through StateViewModel or WithViewModel"
+                "@Injected can only be used within ViewModels created through StateViewModel or WithViewModel",
+                file: file,
+                line: line
             )
         }
         guard let value = container[D.self]?[keyPath: keyPath] else {
             fatalError(
-                "No dependency for keyPath \(keyPath) found in the dependency container. Inject the base type with .inject(_:) at a parent view."
+                "No dependency for keyPath \(keyPath) found in the dependency container. Inject the base type with .inject(_:) in a parent view's body.",
+                file: file,
+                line: line
             )
         }
         self.value = value
