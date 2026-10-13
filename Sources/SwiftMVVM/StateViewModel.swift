@@ -92,6 +92,16 @@ public struct StateViewModel<ViewModel: AnyObject & Observable>: DynamicProperty
         }
     }
 
+    /// Creates the view model from one optional environment value and the environment, waiting while the value is `nil`.
+    public init<Value>(
+        _ keyPath: KeyPath<EnvironmentValues, Value?>,
+        makeViewModel: @escaping (Value, EnvironmentValues) -> ViewModel
+    ) {
+        self.makeViewModel = { env in
+            env[keyPath: keyPath].map { makeViewModel($0, env) }
+        }
+    }
+
     /// Creates a StateViewModel with a simple autoclosure that creates the view model.
     ///
     /// This initializer is convenient when the view model doesn't need environment values.

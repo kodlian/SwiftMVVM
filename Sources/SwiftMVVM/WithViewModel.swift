@@ -110,6 +110,16 @@ public struct WithViewModel<ViewModel: AnyObject & Observable, Content: View>: V
         self.content = content
     }
 
+    /// Builds the view model from one optional environment value and the environment; renders nothing while the value is `nil`.
+    public init<Value>(
+        _ keyPath: KeyPath<EnvironmentValues, Value?>,
+        _ makeViewModel: @escaping (Value, EnvironmentValues) -> ViewModel,
+        @ViewBuilder content: @escaping (ViewModel) -> Content
+    ) {
+        self._viewModel = StateViewModel(keyPath, makeViewModel: makeViewModel)
+        self.content = content
+    }
+
     /// The body of the view that renders the content once the view model is created.
     public var body: some View {
         if let viewModel = _viewModel.createdValue {

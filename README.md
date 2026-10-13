@@ -314,6 +314,8 @@ struct ContentView: View {
 }
 ```
 
+To read other environment values too, take the environment as a second parameter: `WithViewModel(\.myService) { service, env in MyViewModel(service: service, locale: env.locale) }`.
+
 A closure factory may also return `nil`: `WithViewModel` then renders nothing and calls the factory again on the next update.
 
 ---
