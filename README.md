@@ -300,6 +300,22 @@ struct MyView {
 
 > **Note**: This eliminates the need to add an autoclosure initializer to your view. Otherwise, the view model would be recreated repeatedly if you simply pass the creation statement of your view model to the view.
 
+When the view model needs an optional environment value, pass its key path: the factory receives the unwrapped value, and nothing is rendered while it is `nil`.
+
+```swift
+struct ContentView: View {
+    var body: some View {
+        WithViewModel(\.myService) { service in
+            MyViewModel(service: service)
+        } content: { viewModel in
+            MyView(viewModel: viewModel)
+        }
+    }
+}
+```
+
+A closure factory may also return `nil`: `WithViewModel` then renders nothing and calls the factory again on the next update.
+
 ---
 
 ### Dependency Injection

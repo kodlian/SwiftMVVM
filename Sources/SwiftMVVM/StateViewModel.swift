@@ -72,13 +72,24 @@ public struct StateViewModel<ViewModel: AnyObject & Observable>: DynamicProperty
 
     @State private var reference = LazyRerefence()
     @Environment(\.self) private var env
-    let makeViewModel: (EnvironmentValues) -> ViewModel
+    let makeViewModel: (EnvironmentValues) -> ViewModel?
 
     /// Creates a StateViewModel with a factory closure that receives environment values.
     ///
-    /// - Parameter makeViewModel: A closure that creates the view model using environment values
-    public init(makeViewModel: @escaping (EnvironmentValues) -> ViewModel) {
+    /// - Parameter makeViewModel: A closure that creates the view model using environment values.
+    ///   Return `nil` to skip creation for now; the closure runs again on the next update.
+    public init(makeViewModel: @escaping (EnvironmentValues) -> ViewModel?) {
         self.makeViewModel = makeViewModel
+    }
+
+    /// Creates the view model from one optional environment value, waiting while it is `nil`.
+    public init<Value>(
+        _ keyPath: KeyPath<EnvironmentValues, Value?>,
+        makeViewModel: @escaping (Value) -> ViewModel
+    ) {
+        self.makeViewModel = { env in
+            env[keyPath: keyPath].map(makeViewModel)
+        }
     }
 
     /// Creates a StateViewModel with a simple autoclosure that creates the view model.
@@ -94,12 +105,17 @@ public struct StateViewModel<ViewModel: AnyObject & Observable>: DynamicProperty
 
     /// The view model instance.
     ///
-    /// Accessing this property before the view is rendered will cause a runtime error.
+    /// Accessing this property before the view is rendered and its factory returned a view model will cause a runtime error.
     public var wrappedValue: ViewModel {
         precondition(
             reference.value != nil,
-            "StateViewModel should be accessed only after the view is rendered.")
+            "StateViewModel should be accessed only after the view is rendered and its factory returned a view model.")
         return reference.value!
+    }
+
+    /// The view model, or `nil` until the factory has returned one.
+    public var createdValue: ViewModel? {
+        reference.value
     }
 
     /// A bindable wrapper around the view model for two-way data binding.
